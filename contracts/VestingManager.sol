@@ -28,6 +28,10 @@ contract VestingManager is Ownable {
     uint256 public constant DAYS_365 = 365 days;
 
     event PoolConfigured(uint256 indexed poolId, bytes32 merkleRoot, uint256 totalAllocation);
+    event PoolFinalized(uint256 indexed poolId);
+    event Deposited(uint256 indexed poolId, uint256 amount);
+    event Claimed(uint256 indexed poolId, address indexed account, uint256 amount);
+    event UnclaimedBurned(uint256 indexed poolId, uint256 amount);
 
     constructor(address tokenAddress) Ownable(msg.sender) {
         require(tokenAddress != address(0), "token=0");
