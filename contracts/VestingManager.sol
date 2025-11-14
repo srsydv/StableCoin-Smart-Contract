@@ -61,4 +61,19 @@ contract VestingManager is Ownable {
         emit PoolConfigured(poolId, merkleRoot, totalAllocation);
     }
 
+     function depositForPool(uint256 poolId, uint256 amount) external onlyOwner {
+        require(token.transferFrom(msg.sender, address(this), amount), "transferFrom failed");
+        emit Deposited(poolId, amount);
+    }
+
+    function finalizePool(uint256 poolId) external onlyOwner {
+        Pool storage p = pools[poolId];
+        require(p.merkleRoot != bytes32(0), "not set");
+        p.finalized = true;
+        emit PoolFinalized(poolId);
+    }
+
+   
+
+
 }
