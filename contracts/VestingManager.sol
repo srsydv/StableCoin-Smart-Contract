@@ -73,7 +73,19 @@ contract VestingManager is Ownable {
         emit PoolFinalized(poolId);
     }
 
-   
+    function claim(uint256 poolId, uint256 allocation, bytes32[] calldata merkleProof) external {
+        Pool storage p = pools[poolId];
+        bytes32 leaf = keccak256(abi.encodePacked(msg.sender, allocation));
+        require(MerkleProof.verify(merkleProof, p.merkleRoot, leaf), "invalid proof");
+        uint256 vested = vestedAmount(poolId, allocation);
+        uint256 prev = claimed[poolId][msg.sender];
+        require(vested > prev, "nothing");
+        uint256 due = vested - prev;
+        claimed[poolId][msg.sender] = vested;
+        p.totalClaimed += due;
+        require(token.transfer(msg.sender, due), "transfer failed");
+        emit Claimed(poolId, msg.sender, due);
+    }
 
 
 }
