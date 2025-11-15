@@ -94,7 +94,13 @@ contract VestingManager is Ownable {
         if (block.timestamp >= p.vestingEndTimestamp) return allocation;
         uint256 elapsed = block.timestamp - p.tgeTimestamp;
         if (elapsed <= p.cliffSeconds) return tgeAmt;
-        
+        uint256 linearTotal = allocation - tgeAmt;
+        uint256 linearDuration = p.vestingSeconds - p.cliffSeconds;
+        uint256 linearElapsed = elapsed - p.cliffSeconds;
+        uint256 slices = p.monthlySliceSeconds > 0 ? (linearElapsed / p.monthlySliceSeconds) : 0;
+        uint256 totalSlices = p.monthlySliceSeconds > 0 ? (linearDuration / p.monthlySliceSeconds) : 1;
+        uint256 unlocked = (linearTotal * slices) / totalSlices;
+        return tgeAmt + unlocked;
     }
 
 
