@@ -87,5 +87,15 @@ contract VestingManager is Ownable {
         emit Claimed(poolId, msg.sender, due);
     }
 
+    function vestedAmount(uint256 poolId, uint256 allocation) public view returns (uint256) {
+        Pool memory p = pools[poolId];
+        if (block.timestamp < p.tgeTimestamp) return 0;
+        uint256 tgeAmt = (allocation * p.tgePercentBps) / BPS_DENOM;
+        if (block.timestamp >= p.vestingEndTimestamp) return allocation;
+        uint256 elapsed = block.timestamp - p.tgeTimestamp;
+        if (elapsed <= p.cliffSeconds) return tgeAmt;
+        
+    }
+
 
 }
